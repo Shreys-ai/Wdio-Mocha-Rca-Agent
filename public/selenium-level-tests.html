@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Selenium Level Tests Page</title>
+    <style>
+        .test-section {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+
+        .success-state {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+        }
+
+        .failure-state {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+        }
+
+        .response-display {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 3px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            margin: 5px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .error-button {
+            background-color: #dc3545;
+        }
+
+        .error-button:hover {
+            background-color: #c82333;
+        }
+
+        .interactable {
+            pointer-events: auto;
+            cursor: pointer;
+        }
+
+        .not-interactable {
+            pointer-events: none;
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        .hidden-element {
+            display: none !important;
+        }
+
+        .invisible-element {
+            visibility: hidden !important;
+        }
+
+        .hidden-by-css {
+            display: none;
+        }
+
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.1);
+            z-index: 9999;
+        }
+
+        iframe {
+            width: 300px;
+            height: 200px;
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Selenium Level Tests Page</h1>
+    <p>This page contains all scenarios for Selenium testing - both success and failure modes</p>
+
+    <div id="test-container">
+        <!-- Element Availability Tests -->
+        <div id="element-availability-section">
+            <h3>Element Availability Tests</h3>
+            
+            <div class="test-section" id="availability-test-section">
+                <h4>Element Availability Tests</h4>
+                <button onclick="testElementAvailability()">Test Element Availability</button>
+                <button onclick="testIframeInteraction()">Test Iframe Interaction</button>
+                <button onclick="testDynamicElementInteraction()">Test Dynamic Element</button>
+                <div id="availability-response" class="response-display"></div>
+            </div>
+        </div>
+
+        <!-- Element State Tests -->
+        <div id="element-state-section">
+            <h3>Element State Tests</h3>
+            
+            <div class="test-section" id="state-test-section">
+                <h4>Element State Tests</h4>
+                <button onclick="testPageRefreshHandling()">Test Page Refresh Handling</button>
+                <button onclick="testElementVisibilityVerification()">Test Element Visibility</button>
+                <button onclick="testElementStateVerification()">Test Element State</button>
+                <div id="state-response" class="response-display"></div>
+            </div>
+        </div>
+
+        <!-- Browser Performance Tests -->
+        <div id="browser-performance-section">
+            <h3>Browser Performance Tests</h3>
+            
+            <div class="test-section" id="performance-test-section">
+                <h4>Browser Performance Tests</h4>
+                <button onclick="testPageLoadingPerformance()">Test Page Loading Performance</button>
+                <button onclick="testHiddenElementInteraction()">Test Hidden Element Interaction</button>
+                <button onclick="testOverlayInteraction()">Test Overlay Interaction</button>
+                <button onclick="testDisabledElementInteraction()">Test Disabled Element Interaction</button>
+                <div id="performance-response" class="response-display"></div>
+            </div>
+        </div>
+
+        <!-- Test Elements -->
+        <div id="test-elements" style="display: block; margin-top: 20px; padding: 15px; border: 1px solid #ccc;">
+            <h4>Test Elements</h4>
+            
+            <!-- Success scenario elements -->
+            <button id="success-click-button">Success Click Button</button>
+            <input id="success-input" placeholder="Success Input">
+            <div id="success-text">Success Text Element</div>
+            <button id="enabled-button">Enabled Button</button>
+            <div id="visible-element" style="display: block;">Visible Element</div>
+            
+            <!-- Elements for failure scenarios -->
+            <button id="removable-element">Removable Element</button>
+            <button onclick="removeElement()" id="remove-button">Remove Above Element</button>
+            
+            <!-- Dynamic content -->
+            <div id="dynamic-content">Dynamic Content</div>
+            
+            <!-- Visibility elements -->
+            <div id="never-appears" style="display: none;">Never Appears</div>
+            <div id="hidden-element" style="display: none;">Hidden Element</div>
+            <button id="always-disabled" disabled>Always Disabled</button>
+            
+            <!-- Interaction elements -->
+            <button id="hidden-by-css" class="hidden-by-css">Hidden by CSS</button>
+            <div id="overlay-container" style="position: relative;">
+                <button id="covered-button">Covered Button</button>
+                <div id="overlay" class="overlay" style="display: none;"></div>
+            </div>
+            <button id="disabled-button" disabled>Disabled Button</button>
+            <input id="disabled-input" disabled placeholder="Disabled Input">
+            
+            <!-- Iframe content -->
+            <iframe id="test-iframe" src="data:text/html,<button id='iframe-button'>Iframe Button</button>"></iframe>
+            
+            <!-- Content element for page load tests -->
+            <div id="content">Page Content</div>
+        </div>
+
+        <!-- Control Panel -->
+        <div id="control-panel" style="margin-top: 30px; padding: 20px; border: 2px solid #007bff;">
+            <h3>Test Control Panel</h3>
+            <button onclick="configureForSuccess()">Configure for Success</button>
+            <button onclick="configureForFailure()">Configure for Failure</button>
+            <button onclick="clearAllResponses()">Clear All Responses</button>
+            <p id="status">Status: Ready</p>
+        </div>
+    </div>
+
+    <script>
+        // Global state management
+        let currentMode = 'neutral';
+        let shouldSimulateFailures = false;
+        let staleElementReference = null;
+
+        // Initialize page
+        function initializePage() {
+            updateStatus('Page initialized - ready for test scenarios');
+        }
+
+        // Configure page for success scenarios
+        function configureForSuccess() {
+            currentMode = 'success';
+            shouldSimulateFailures = false;
+            
+            // Update visual state
+            document.querySelectorAll('.test-section').forEach(el => {
+                el.classList.add('success-state');
+                el.classList.remove('failure-state');
+            });
+            
+            updateStatus('Success mode configured - all element operations will succeed');
+        }
+
+        // Configure page for failure scenarios
+        function configureForFailure() {
+            currentMode = 'failure';
+            shouldSimulateFailures = true;
+            
+            // Update visual state
+            document.querySelectorAll('.test-section').forEach(el => {
+                el.classList.add('failure-state');
+                el.classList.remove('success-state');
+            });
+            
+            updateStatus('Failure mode configured - element operations will fail');
+        }
+
+        // Element Availability Tests
+        function testElementAvailability() {
+            if (shouldSimulateFailures) {
+                // Simulate NoSuchElementException - element doesn't exist
+                document.getElementById('availability-response').textContent = 
+                    'Element Availability Test Failed:\nError: NoSuchElementError\nMessage: Element with selector #completely-missing-element not found\nSelector: #completely-missing-element';
+                updateStatus('Error: Element availability test failed - element not found');
+            } else {
+                document.getElementById('availability-response').textContent = 
+                    'Element Availability Test Successful:\nElement: completely-missing-element\nStatus: Found and accessible\nResult: Element verification completed successfully';
+                updateStatus('Successfully verified element availability');
+            }
+        }
+
+        function testIframeInteraction() {
+            if (shouldSimulateFailures) {
+                // Simulate NoSuchElementException - iframe element not accessible
+                document.getElementById('availability-response').textContent = 
+                    'Iframe Interaction Test Failed:\nError: NoSuchElementError\nMessage: Element with selector #iframe-button not found in iframe\nFrame: test-iframe';
+                updateStatus('Error: Iframe interaction failed - element not found in iframe');
+            } else {
+                document.getElementById('availability-response').textContent = 
+                    'Iframe Interaction Test Successful:\nFrame: test-iframe\nElement: iframe-button\nResult: Successfully interacted with iframe element';
+                updateStatus('Successfully interacted with iframe element');
+            }
+        }
+
+        function testDynamicElementInteraction() {
+            if (shouldSimulateFailures) {
+                // Simulate NoSuchElementException - element removed dynamically
+                setTimeout(() => {
+                    const removableElement = document.getElementById('removable-element');
+                    if (removableElement && removableElement.parentNode) {
+                        removableElement.parentNode.removeChild(removableElement);
+                    }
+                }, 1000);
+                
+                document.getElementById('availability-response').textContent = 
+                    'Dynamic Element Interaction Test Failed:\nError: NoSuchElementError\nMessage: Element was removed from DOM\nSelector: #removable-element\nCause: Dynamic removal';
+                updateStatus('Error: Dynamic element interaction failed - element removed');
+            } else {
+                document.getElementById('availability-response').textContent = 
+                    'Dynamic Element Interaction Test Successful:\nElement: removable-element\nAction: click\nResult: Successfully interacted with dynamic element';
+                updateStatus('Successfully interacted with dynamic element');
+            }
+        }
+
+        // Element State Tests
+        function testPageRefreshHandling() {
+            if (shouldSimulateFailures) {
+                // Simulate StaleElementReferenceException
+                staleElementReference = document.getElementById('dynamic-content');
+                setTimeout(() => {
+                    const container = document.getElementById('test-elements');
+                    if (container) {
+                        container.innerHTML = container.innerHTML; // Refresh content
+                    }
+                }, 2000);
+                
+                document.getElementById('state-response').textContent = 
+                    'Page Refresh Handling Test Failed:\nError: StaleElementReferenceError\nMessage: Element reference is stale after page refresh\nElement: dynamic-content';
+                updateStatus('Error: Page refresh handling failed - stale element reference');
+            } else {
+                document.getElementById('state-response').textContent = 
+                    'Page Refresh Handling Test Successful:\nElement: dynamic-content\nState: Valid reference maintained\nResult: Element reference survived page operations';
+                updateStatus('Successfully handled page refresh');
+            }
+        }
+
+        function testElementVisibilityVerification() {
+            if (shouldSimulateFailures) {
+                // Simulate TimeoutException - element never appears
+                document.getElementById('state-response').textContent = 
+                    'Element Visibility Verification Test Failed:\nError: TimeoutError\nMessage: Element did not become visible within timeout\nSelector: #never-appears\nTimeout: 3000ms';
+                updateStatus('Error: Element visibility verification failed - timeout waiting for visibility');
+            } else {
+                document.getElementById('state-response').textContent = 
+                    'Element Visibility Verification Test Successful:\nElement: never-appears\nVisibility: visible\nResult: Element became visible within timeout';
+                updateStatus('Successfully verified element visibility');
+            }
+        }
+
+        function testElementStateVerification() {
+            if (shouldSimulateFailures) {
+                // Simulate TimeoutException - element never becomes enabled
+                document.getElementById('state-response').textContent = 
+                    'Element State Verification Test Failed:\nError: TimeoutError\nMessage: Element did not become enabled within timeout\nSelector: #always-disabled\nTimeout: 3000ms';
+                updateStatus('Error: Element state verification failed - timeout waiting for enabled state');
+            } else {
+                document.getElementById('state-response').textContent = 
+                    'Element State Verification Test Successful:\nElement: always-disabled\nState: enabled\nResult: Element became enabled within timeout';
+                updateStatus('Successfully verified element state');
+            }
+        }
+
+        // Browser Performance Tests
+        function testPageLoadingPerformance() {
+            if (shouldSimulateFailures) {
+                // Simulate PageLoadTimeoutException
+                document.getElementById('performance-response').textContent = 
+                    'Page Loading Performance Test Failed:\nError: PageLoadTimeoutError\nMessage: Page load timed out\nURL: https://httpstat.us/200?sleep=15000\nTimeout: 5000ms';
+                updateStatus('Error: Page loading performance test failed - page load timeout');
+            } else {
+                document.getElementById('performance-response').textContent = 
+                    'Page Loading Performance Test Successful:\nURL: Current page\nLoad Time: 250ms\nResult: Page loaded within acceptable time\nContent: Available';
+                updateStatus('Successfully completed page loading performance test');
+            }
+        }
+
+        function testHiddenElementInteraction() {
+            if (shouldSimulateFailures) {
+                // Simulate ElementNotInteractableException
+                document.getElementById('performance-response').textContent = 
+                    'Hidden Element Interaction Test Failed:\nError: ElementNotInteractableError\nMessage: Element is not interactable (hidden by CSS)\nSelector: #hidden-by-css\nDisplay: none';
+                updateStatus('Error: Hidden element interaction failed - element not interactable');
+            } else {
+                document.getElementById('performance-response').textContent = 
+                    'Hidden Element Interaction Test Successful:\nElement: hidden-by-css\nVisibility: visible\nResult: Successfully interacted with previously hidden element';
+                updateStatus('Successfully interacted with hidden element');
+            }
+        }
+
+        function testOverlayInteraction() {
+            if (shouldSimulateFailures) {
+                // Simulate ElementClickInterceptedException
+                const overlay = document.getElementById('overlay');
+                if (overlay) {
+                    overlay.style.display = 'block';
+                }
+                
+                document.getElementById('performance-response').textContent = 
+                    'Overlay Interaction Test Failed:\nError: ElementClickInterceptedError\nMessage: Element click intercepted by overlay\nSelector: #covered-button\nIntercepting Element: overlay';
+                updateStatus('Error: Overlay interaction failed - click intercepted');
+            } else {
+                document.getElementById('performance-response').textContent = 
+                    'Overlay Interaction Test Successful:\nElement: covered-button\nAction: click\nResult: Successfully clicked element without interception';
+                updateStatus('Successfully interacted with element under overlay');
+            }
+        }
+
+        function testDisabledElementInteraction() {
+            if (shouldSimulateFailures) {
+                // Simulate InvalidElementStateException
+                document.getElementById('performance-response').textContent = 
+                    'Disabled Element Interaction Test Failed:\nError: InvalidElementStateError\nMessage: Cannot interact with disabled elements\nButton: #disabled-button (disabled)\nInput: #disabled-input (disabled)';
+                updateStatus('Error: Disabled element interaction failed - elements are disabled');
+            } else {
+                document.getElementById('performance-response').textContent = 
+                    'Disabled Element Interaction Test Successful:\nButton: disabled-button (enabled)\nInput: disabled-input (enabled)\nResult: Successfully interacted with enabled elements';
+                updateStatus('Successfully interacted with enabled elements');
+            }
+        }
+
+        // Utility function to remove element (for dynamic tests)
+        function removeElement() {
+            const element = document.getElementById('removable-element');
+            if (element && element.parentNode) {
+                element.parentNode.removeChild(element);
+            }
+        }
+
+        // Utility functions
+        function clearAllResponses() {
+            document.querySelectorAll('.response-display').forEach(el => {
+                el.textContent = '';
+            });
+            updateStatus('All responses cleared');
+        }
+
+        function updateStatus(message) {
+            const statusElement = document.getElementById('status');
+            if (statusElement) {
+                statusElement.textContent = 'Status: ' + message;
+            }
+        }
+
+        // Initialize page on load
+        document.addEventListener('DOMContentLoaded', function () {
+            initializePage();
+        });
+
+        // Utility functions for test automation
+        function getTestElement(type) {
+            switch (type) {
+                case 'missing':
+                    return document.getElementById('completely-missing-element');
+                case 'removable':
+                    return document.getElementById('removable-element');
+                case 'dynamic':
+                    return document.getElementById('dynamic-content');
+                case 'never-appears':
+                    return document.getElementById('never-appears');
+                case 'disabled':
+                    return document.getElementById('always-disabled');
+                case 'hidden':
+                    return document.getElementById('hidden-by-css');
+                case 'covered':
+                    return document.getElementById('covered-button');
+                case 'disabled-button':
+                    return document.getElementById('disabled-button');
+                case 'disabled-input':
+                    return document.getElementById('disabled-input');
+                case 'iframe-button':
+                    return document.getElementById('iframe-button');
+                case 'content':
+                    return document.getElementById('content');
+                default:
+                    return null;
+            }
+        }
+
+        // Expose functions globally for test automation
+        window.seleniumTestUtils = {
+            configureForSuccess,
+            configureForFailure,
+            testElementAvailability,
+            testIframeInteraction,
+            testDynamicElementInteraction,
+            testPageRefreshHandling,
+            testElementVisibilityVerification,
+            testElementStateVerification,
+            testPageLoadingPerformance,
+            testHiddenElementInteraction,
+            testOverlayInteraction,
+            testDisabledElementInteraction,
+            clearAllResponses,
+            getTestElement,
+            getCurrentMode: () => currentMode,
+            // Legacy compatibility
+            enableSuccessMode: configureForSuccess,
+            enableFailureMode: configureForFailure
+        };
+    </script>
+</body>
+
+</html>

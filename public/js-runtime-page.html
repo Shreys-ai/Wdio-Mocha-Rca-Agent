@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaScript Runtime Error Test Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .content-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .error-free-content {
+            display: none; /* This element will never be visible due to JS errors */
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>JavaScript Runtime Error Test Page</h1>
+        
+        <div class="content-section">
+            <h2>Page Content</h2>
+            <p>This page is designed to generate JavaScript runtime errors for testing purposes.</p>
+            <p>The errors will occur automatically when the page loads and during user interactions.</p>
+        </div>
+
+        <div class="content-section">
+            <h2>Interactive Elements</h2>
+            <button id="errorButton">Click Me (Will Cause Error)</button>
+            <button id="normalButton">Normal Button</button>
+            <div id="output" class="status">Page loaded successfully</div>
+        </div>
+
+        <!-- This element will never be shown due to JavaScript errors -->
+        <div class="error-free-content" data-testid="error-free-content">
+            <p>This content indicates no JavaScript errors occurred</p>
+        </div>
+    </div>
+
+    <script>
+        // Immediate runtime error on page load
+        console.log('About to trigger JavaScript runtime error...');
+        
+        // Error 1: Accessing undefined object property
+        setTimeout(() => {
+            try {
+                window.nonExistentGlobalObject.someProperty = 'test';
+            } catch (e) {
+                console.error('Runtime Error 1:', e.message);
+            }
+        }, 100);
+
+        // Error 2: Calling undefined function
+        setTimeout(() => {
+            try {
+                undefinedFunction();
+            } catch (e) {
+                console.error('Runtime Error 2:', e.message);
+            }
+        }, 200);
+
+        // Error 3: Type error with null object
+        setTimeout(() => {
+            try {
+                const nullObj = null;
+                nullObj.someMethod();
+            } catch (e) {
+                console.error('Runtime Error 3:', e.message);
+            }
+        }, 300);
+
+        // Error 4: Reference error
+        setTimeout(() => {
+            try {
+                console.log(undeclaredVariable);
+            } catch (e) {
+                console.error('Runtime Error 4:', e.message);
+            }
+        }, 400);
+
+        // Add event listeners that will cause errors
+        document.addEventListener('DOMContentLoaded', () => {
+            const errorButton = document.getElementById('errorButton');
+            const normalButton = document.getElementById('normalButton');
+            const output = document.getElementById('output');
+
+            if (errorButton) {
+                errorButton.addEventListener('click', () => {
+                    output.textContent = 'Button clicked - about to cause error...';
+                    // This will cause an error
+                    setTimeout(() => {
+                        undefinedVariableClick.nonExistentMethod();
+                    }, 50);
+                });
+            }
+
+            if (normalButton) {
+                normalButton.addEventListener('click', () => {
+                    output.textContent = 'Normal button clicked successfully';
+                });
+            }
+        });
+
+        // Uncaught error that will appear in console
+        setTimeout(() => {
+            throw new Error('Uncaught runtime error for testing purposes');
+        }, 500);
+
+        // Another uncaught error with different type
+        setTimeout(() => {
+            const obj = undefined;
+            obj.property.nested; // Will cause TypeError
+        }, 600);
+    </script>
+</body>
+</html>

@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Network Level Tests Page</title>
+    <style>
+        .test-section {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .success-state {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+        }
+        .failure-state {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+        }
+        .response-display {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 3px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            margin: 5px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .error-button {
+            background-color: #dc3545;
+        }
+        .error-button:hover {
+            background-color: #c82333;
+        }
+        .network-status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .status-success {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .status-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <h1>Network Level Tests Page</h1>
+    <p>This page contains all scenarios for Network-level testing - both success and failure modes</p>
+    
+    <div id="test-container">
+        <!-- DNS Resolution Tests -->
+        <div id="dns-section">
+            <h3>DNS Resolution Tests</h3>
+            
+            <div class="test-section" id="dns-test-section">
+                <h4>DNS Resolution Tests</h4>
+                <button onclick="testDNSResolution()">Test DNS Resolution</button>
+                <button onclick="testDNSTimeout()">Test DNS Timeout</button>
+                <button onclick="testSubdomainResolution()">Test Subdomain Resolution</button>
+                <div id="dns-response" class="response-display"></div>
+            </div>
+        </div>
+
+        <!-- Connection Timeout Tests -->
+        <div id="connection-section">
+            <h3>Connection Timeout Tests</h3>
+            
+            <div class="test-section" id="connection-test-section">
+                <h4>Connection Timeout Tests</h4>
+                <button onclick="testServerConnectionTimeout()">Test Server Connection Timeout</button>
+                <button onclick="testPortTimeout()">Test Port Timeout</button>
+                <button onclick="testFirewallBlocking()">Test Firewall Blocking</button>
+                <div id="connection-response" class="response-display"></div>
+            </div>
+        </div>
+
+        <!-- Resource Loading Tests -->
+        <div id="resource-section">
+            <h3>Resource Loading Tests</h3>
+            
+            <div class="test-section" id="resource-test-section">
+                <h4>Resource Loading Tests</h4>
+                <button onclick="testImageLoading()">Test Image Loading</button>
+                <button onclick="testCSSLoading()">Test CSS Loading</button>
+                <button onclick="testJavaScriptLoading()">Test JavaScript Loading</button>
+                <button onclick="testFontLoading()">Test Font Loading</button>
+                <div id="resource-response" class="response-display"></div>
+                <div id="resource-display"></div>
+            </div>
+        </div>
+
+        <!-- API Endpoint Tests -->
+        <div id="api-section">
+            <h3>API Endpoint Tests</h3>
+            
+            <div class="test-section" id="api-test-section">
+                <h4>API Endpoint Tests</h4>
+                <button onclick="testRESTAPIEndpoint()">Test REST API Endpoint</button>
+                <button onclick="testGraphQLEndpoint()">Test GraphQL Endpoint</button>
+                <button onclick="testWebSocketConnection()">Test WebSocket Connection</button>
+                <div id="api-response" class="response-display"></div>
+            </div>
+        </div>
+
+        <!-- CDN and External Service Tests -->
+        <div id="cdn-section">
+            <h3>CDN and External Service Tests</h3>
+            
+            <div class="test-section" id="cdn-test-section">
+                <h4>CDN and External Service Tests</h4>
+                <button onclick="testCDNLoading()">Test CDN Loading</button>
+                <button onclick="testThirdPartyService()">Test Third-Party Service</button>
+                <button onclick="testAnalyticsLoading()">Test Analytics Loading</button>
+                <div id="cdn-response" class="response-display"></div>
+            </div>
+        </div>
+
+        <!-- Protocol and Security Tests -->
+        <div id="security-section">
+            <h3>Protocol and Security Tests</h3>
+            
+            <div class="test-section" id="security-test-section">
+                <h4>Protocol and Security Tests</h4>
+                <button onclick="testSSLHandshake()">Test SSL Handshake</button>
+                <button onclick="testMixedContent()">Test Mixed Content</button>
+                <button onclick="testHTTPRedirect()">Test HTTP Redirect</button>
+                <div id="security-response" class="response-display"></div>
+            </div>
+        </div>
+
+        <!-- Network Performance Tests -->
+        <div id="performance-section">
+            <h3>Network Performance Tests</h3>
+            
+            <div class="test-section" id="performance-test-section">
+                <h4>Network Performance Tests</h4>
+                <button onclick="testSlowNetwork()">Test Slow Network</button>
+                <button onclick="testBandwidthLimit()">Test Bandwidth Limit</button>
+                <div id="performance-response" class="response-display"></div>
+            </div>
+        </div>
+
+        <!-- Test Elements (Hidden by default) -->
+        <div id="test-elements" style="display: none;">
+            <!-- Status indicators for tests -->
+            <div id="page-loaded-successfully">Page Loaded Successfully</div>
+            <div id="connection-established">Connection Established</div>
+            <div id="subdomain-loaded">Subdomain Loaded</div>
+            <div id="slow-server-response">Slow Server Response</div>
+            <div id="port-connection-success">Port Connection Success</div>
+            <div id="firewall-bypassed">Firewall Bypassed</div>
+            <div id="image-loaded-successfully">Image Loaded Successfully</div>
+            <div id="css-loaded-indicator">CSS Loaded Indicator</div>
+            <div id="script-loaded-indicator">Script Loaded Indicator</div>
+            <div id="font-loaded-indicator">Font Loaded Indicator</div>
+            <div id="api-response-received">API Response Received</div>
+            <div id="graphql-response-received">GraphQL Response Received</div>
+            <div id="websocket-connected">WebSocket Connected</div>
+            <div id="cdn-resource-loaded">CDN Resource Loaded</div>
+            <div id="third-party-response">Third Party Response</div>
+            <div id="analytics-loaded">Analytics Loaded</div>
+            <div id="ssl-verified">SSL Verified</div>
+            <div id="mixed-content-loaded">Mixed Content Loaded</div>
+            <div id="redirect-completed">Redirect Completed</div>
+            <div id="content-loaded">Content Loaded</div>
+            <div id="bandwidth-test-complete">Bandwidth Test Complete</div>
+            
+            <!-- Test images and resources -->
+            <img src="https://test-data-rca.netlify.app/missing-image.png" alt="Missing Image">
+            
+            <!-- Test links -->
+            <a href="https://thisdoesnotexistdomain12345.com">Non-existent Domain</a>
+            <a href="https://1.2.3.4.5">Invalid IP</a>
+            <a href="https://nonexistent.github.io">Non-existent Subdomain</a>
+            <a href="https://httpstat.us/200?sleep=30000">Slow Server</a>
+            <a href="https://google.com:9999">Blocked Port</a>
+            <a href="https://10.0.0.1:8080">Firewall Blocked</a>
+            <a href="https://expired.badssl.com/">Expired SSL</a>
+            <a href="https://httpbingo.org/redirect/10">Redirect Chain</a>
+            <a href="https://httpbingo.org/drip?duration=20&numbytes=1000">Slow Content</a>
+        </div>
+
+        <!-- Network Status Display -->
+        <div id="network-status-section">
+            <h3>Network Status Monitor</h3>
+            <div id="network-status" class="network-status status-success">Network Status: Online</div>
+            <button onclick="refreshNetworkStatus()">Refresh Network Status</button>
+        </div>
+
+        <!-- Control Panel -->
+        <div id="control-panel" style="margin-top: 30px; padding: 20px; border: 2px solid #007bff;">
+            <h3>Test Control Panel</h3>
+            <button onclick="configureForSuccess()">Configure for Success</button>
+            <button onclick="configureForFailure()">Configure for Failure</button>
+            <button onclick="clearAllResponses()">Clear All Responses</button>
+            <button onclick="simulateNetworkOffline()">Simulate Network Offline</button>
+            <button onclick="simulateNetworkOnline()">Simulate Network Online</button>
+            <p id="status">Status: Ready</p>
+        </div>
+    </div>
+
+    <script>
+        // Global state management
+        let currentMode = 'neutral';
+        let networkOnline = true;
+        let simulatedLatency = 100; // milliseconds
+        let shouldSimulateFailures = false;
+
+        // Initialize page
+        function initializePage() {
+            updateNetworkStatus();
+            updateStatus('Page initialized - ready for test scenarios');
+        }
+
+        // Configure page for success scenarios
+        function configureForSuccess() {
+            currentMode = 'success';
+            shouldSimulateFailures = false;
+            networkOnline = true;
+            
+            // Update visual state
+            document.querySelectorAll('.test-section').forEach(el => {
+                el.classList.add('success-state');
+                el.classList.remove('failure-state');
+            });
+            
+            updateStatus('Success mode configured - all network operations will succeed');
+        }
+
+        // Configure page for failure scenarios
+        function configureForFailure() {
+            currentMode = 'failure';
+            shouldSimulateFailures = true;
+            
+            // Update visual state
+            document.querySelectorAll('.test-section').forEach(el => {
+                el.classList.add('failure-state');
+                el.classList.remove('success-state');
+            });
+            
+            updateStatus('Failure mode configured - network operations will fail');
+        }
+
+        // DNS Resolution Tests
+        function testDNSResolution() {
+            if (shouldSimulateFailures) {
+                // Simulate DNS resolution error for non-existent domain
+                document.getElementById('dns-response').textContent = 
+                    'DNS Resolution Test Failed:\nDomain: thisdoesnotexistdomain12345.com\nError: ENOTFOUND\nMessage: DNS resolution failed for non-existent domain\nDNS Server: No response';
+                updateStatus('Error: DNS resolution failed for non-existent domain');
+            } else {
+                document.getElementById('dns-response').textContent = 
+                    'DNS Resolution Test Successful:\nDomain: thisdoesnotexistdomain12345.com\nStatus: Resolved\nIP Address: 192.168.1.1\nResponse Time: 50ms';
+                updateStatus('Successfully resolved DNS for domain');
+            }
+        }
+
+        function testDNSTimeout() {
+            if (shouldSimulateFailures) {
+                // Simulate DNS timeout error
+                setTimeout(() => {
+                    document.getElementById('dns-response').textContent = 
+                        'DNS Timeout Test Failed:\nIP: 1.2.3.4.5\nError: ETIMEDOUT\nMessage: DNS lookup timeout\nTimeout: 5000ms';
+                    updateStatus('Error: DNS lookup timeout');
+                }, 2000);
+            } else {
+                document.getElementById('dns-response').textContent = 
+                    'DNS Timeout Test Successful:\nIP: 1.2.3.4.5\nStatus: Resolved\nResponse Time: 100ms\nConnection: Established';
+                updateStatus('Successfully resolved DNS within timeout');
+            }
+        }
+
+        function testSubdomainResolution() {
+            if (shouldSimulateFailures) {
+                // Simulate subdomain resolution error
+                document.getElementById('dns-response').textContent = 
+                    'Subdomain Resolution Test Failed:\nSubdomain: nonexistent.github.io\nError: ENOTFOUND\nMessage: Subdomain does not exist\nDNS Server: No response';
+                updateStatus('Error: Subdomain resolution failed');
+            } else {
+                document.getElementById('dns-response').textContent = 
+                    'Subdomain Resolution Test Successful:\nSubdomain: nonexistent.github.io\nStatus: Resolved\nIP Address: 185.199.108.153\nResponse Time: 75ms';
+                updateStatus('Successfully resolved subdomain');
+            }
+        }
+
+        // Connection Timeout Tests
+        function testServerConnectionTimeout() {
+            if (shouldSimulateFailures) {
+                // Simulate server connection timeout
+                setTimeout(() => {
+                    document.getElementById('connection-response').textContent = 
+                        'Server Connection Timeout Test Failed:\nURL: https://httpstat.us/200?sleep=30000\nError: ETIMEDOUT\nMessage: Server connection timeout after 5000ms\nStatus: Connection failed';
+                    updateStatus('Error: Server connection timeout');
+                }, 3000);
+            } else {
+                document.getElementById('connection-response').textContent = 
+                    'Server Connection Timeout Test Successful:\nURL: https://httpstat.us/200?sleep=30000\nStatus: 200 OK\nResponse Time: 250ms\nConnection: Established';
+                updateStatus('Successfully connected to server');
+            }
+        }
+
+        function testPortTimeout() {
+            if (shouldSimulateFailures) {
+                // Simulate port timeout error
+                setTimeout(() => {
+                    document.getElementById('connection-response').textContent = 
+                        'Port Timeout Test Failed:\nURL: https://google.com:9999\nError: ECONNREFUSED\nMessage: Port 9999 is blocked or not responding\nTimeout: 5000ms';
+                    updateStatus('Error: Port connection timeout');
+                }, 2500);
+            } else {
+                document.getElementById('connection-response').textContent = 
+                    'Port Timeout Test Successful:\nURL: https://google.com:9999\nStatus: Connected\nPort: 9999\nResponse Time: 150ms';
+                updateStatus('Successfully connected to port');
+            }
+        }
+
+        function testFirewallBlocking() {
+            if (shouldSimulateFailures) {
+                // Simulate firewall blocking error
+                setTimeout(() => {
+                    document.getElementById('connection-response').textContent = 
+                        'Firewall Blocking Test Failed:\nURL: https://10.0.0.1:8080\nError: ECONNREFUSED\nMessage: Connection blocked by firewall\nFirewall Rule: Block private IP access';
+                    updateStatus('Error: Connection blocked by firewall');
+                }, 2000);
+            } else {
+                document.getElementById('connection-response').textContent = 
+                    'Firewall Blocking Test Successful:\nURL: https://10.0.0.1:8080\nStatus: Connected\nFirewall: Bypassed\nResponse Time: 200ms';
+                updateStatus('Successfully bypassed firewall');
+            }
+        }
+
+        // Resource Loading Tests
+        function testImageLoading() {
+            if (shouldSimulateFailures) {
+                // Simulate missing image resource error
+                document.getElementById('resource-response').textContent = 
+                    'Image Loading Test Failed:\nURL: https://test-data-rca.netlify.app/missing-image.png\nError: 404 Not Found\nMessage: Image resource not found\nStatus: Failed to load';
+                
+                const display = document.getElementById('resource-display');
+                display.innerHTML = '<div style="color: red; font-weight: bold;">Failed to load missing image</div>';
+                
+                updateStatus('Error: Failed to load missing image resource');
+            } else {
+                document.getElementById('resource-response').textContent = 
+                    'Image Loading Test Successful:\nURL: https://test-data-rca.netlify.app/missing-image.png\nStatus: 200 OK\nType: image/png\nSize: 15KB';
+                
+                const display = document.getElementById('resource-display');
+                display.innerHTML = '<div style="color: green; font-weight: bold;">Image loaded successfully</div>';
+                
+                updateStatus('Successfully loaded image resource');
+            }
+        }
+
+        function testCSSLoading() {
+            if (shouldSimulateFailures) {
+                // Simulate missing stylesheet error
+                document.getElementById('resource-response').textContent = 
+                    'CSS Loading Test Failed:\nURL: https://test-data-rca.netlify.app/missing-styles.css\nError: 404 Not Found\nMessage: Stylesheet not found\nStatus: Failed to load';
+                
+                updateStatus('Error: Failed to load missing stylesheet');
+            } else {
+                document.getElementById('resource-response').textContent = 
+                    'CSS Loading Test Successful:\nURL: https://test-data-rca.netlify.app/missing-styles.css\nStatus: 200 OK\nType: text/css\nSize: 25KB';
+                
+                updateStatus('Successfully loaded stylesheet');
+            }
+        }
+
+        function testJavaScriptLoading() {
+            if (shouldSimulateFailures) {
+                // Simulate missing script error
+                document.getElementById('resource-response').textContent = 
+                    'JavaScript Loading Test Failed:\nURL: https://test-data-rca.netlify.app/missing-script.js\nError: 404 Not Found\nMessage: Script not found\nStatus: Failed to load';
+                
+                updateStatus('Error: Failed to load missing script');
+            } else {
+                document.getElementById('resource-response').textContent = 
+                    'JavaScript Loading Test Successful:\nURL: https://test-data-rca.netlify.app/missing-script.js\nStatus: 200 OK\nType: application/javascript\nSize: 10KB';
+                
+                updateStatus('Successfully loaded JavaScript');
+            }
+        }
+
+        function testFontLoading() {
+            if (shouldSimulateFailures) {
+                // Simulate missing font resource error
+                document.getElementById('resource-response').textContent = 
+                    'Font Loading Test Failed:\nURL: https://test-data-rca.netlify.app/missing-font.woff2\nError: 404 Not Found\nMessage: Font resource not found\nStatus: Failed to load';
+                
+                updateStatus('Error: Failed to load missing font resource');
+            } else {
+                document.getElementById('resource-response').textContent = 
+                    'Font Loading Test Successful:\nURL: https://test-data-rca.netlify.app/missing-font.woff2\nStatus: 200 OK\nType: font/woff2\nSize: 45KB';
+                
+                updateStatus('Successfully loaded font resource');
+            }
+        }
+
+        // API Endpoint Tests
+        function testRESTAPIEndpoint() {
+            if (shouldSimulateFailures) {
+                // Simulate API endpoint error
+                document.getElementById('api-response').textContent = 
+                    'REST API Endpoint Test Failed:\nURL: /api/nonexistent-endpoint\nError: 404 Not Found\nMessage: API endpoint does not exist\nStatus: Failed';
+                updateStatus('Error: REST API endpoint not found');
+            } else {
+                document.getElementById('api-response').textContent = 
+                    'REST API Endpoint Test Successful:\nURL: /api/nonexistent-endpoint\nStatus: 200 OK\nResponse: {"data": "success"}\nResponse Time: 120ms';
+                updateStatus('Successfully accessed REST API endpoint');
+            }
+        }
+
+        function testGraphQLEndpoint() {
+            if (shouldSimulateFailures) {
+                // Simulate GraphQL endpoint error
+                document.getElementById('api-response').textContent = 
+                    'GraphQL Endpoint Test Failed:\nURL: /graphql/missing\nError: 404 Not Found\nMessage: GraphQL endpoint does not exist\nQuery: { nonExistentField }';
+                updateStatus('Error: GraphQL endpoint not found');
+            } else {
+                document.getElementById('api-response').textContent = 
+                    'GraphQL Endpoint Test Successful:\nURL: /graphql/missing\nStatus: 200 OK\nResponse: {"data": {"field": "value"}}\nQuery Time: 85ms';
+                updateStatus('Successfully accessed GraphQL endpoint');
+            }
+        }
+
+        function testWebSocketConnection() {
+            if (shouldSimulateFailures) {
+                // Simulate WebSocket connection error
+                document.getElementById('api-response').textContent = 
+                    'WebSocket Connection Test Failed:\nURL: wss://test-data-rca.netlify.app/missing-websocket\nError: Connection failed\nMessage: WebSocket endpoint not available\nStatus: Failed';
+                updateStatus('Error: WebSocket connection failed');
+            } else {
+                document.getElementById('api-response').textContent = 
+                    'WebSocket Connection Test Successful:\nURL: wss://test-data-rca.netlify.app/missing-websocket\nStatus: Connected\nProtocol: WebSocket\nConnection Time: 200ms';
+                updateStatus('Successfully connected to WebSocket');
+            }
+        }
+
+        // CDN and External Service Tests
+        function testCDNLoading() {
+            if (shouldSimulateFailures) {
+                // Simulate CDN loading error
+                document.getElementById('cdn-response').textContent = 
+                    'CDN Loading Test Failed:\nURL: https://cdn.nonexistent-service.com/library.js\nError: DNS_PROBE_FINISHED_NXDOMAIN\nMessage: CDN service not available\nStatus: Failed';
+                updateStatus('Error: CDN resource loading failed');
+            } else {
+                document.getElementById('cdn-response').textContent = 
+                    'CDN Loading Test Successful:\nURL: https://cdn.nonexistent-service.com/library.js\nStatus: 200 OK\nType: application/javascript\nSize: 125KB\nCache: HIT';
+                updateStatus('Successfully loaded CDN resource');
+            }
+        }
+
+        function testThirdPartyService() {
+            if (shouldSimulateFailures) {
+                // Simulate third-party service error
+                document.getElementById('cdn-response').textContent = 
+                    'Third-Party Service Test Failed:\nURL: https://api.nonexistent-service.com/data\nError: ENOTFOUND\nMessage: Third-party service unavailable\nStatus: Failed';
+                updateStatus('Error: Third-party service integration failed');
+            } else {
+                document.getElementById('cdn-response').textContent = 
+                    'Third-Party Service Test Successful:\nURL: https://api.nonexistent-service.com/data\nStatus: 200 OK\nResponse: {"status": "success"}\nResponse Time: 300ms';
+                updateStatus('Successfully integrated with third-party service');
+            }
+        }
+
+        function testAnalyticsLoading() {
+            if (shouldSimulateFailures) {
+                // Simulate analytics loading error
+                document.getElementById('cdn-response').textContent = 
+                    'Analytics Loading Test Failed:\nURL: https://analytics.missing-service.com/tracker.js\nError: net::ERR_NAME_NOT_RESOLVED\nMessage: Analytics service not available\nStatus: Failed';
+                updateStatus('Error: Analytics service loading failed');
+            } else {
+                document.getElementById('cdn-response').textContent = 
+                    'Analytics Loading Test Successful:\nURL: https://analytics.missing-service.com/tracker.js\nStatus: 200 OK\nType: application/javascript\nSize: 35KB';
+                updateStatus('Successfully loaded analytics service');
+            }
+        }
+
+        // Protocol and Security Tests
+        function testSSLHandshake() {
+            if (shouldSimulateFailures) {
+                // Simulate SSL handshake error
+                document.getElementById('security-response').textContent = 
+                    'SSL Handshake Test Failed:\nURL: https://expired.badssl.com/\nError: SSL_ERROR_EXPIRED_CERT\nMessage: SSL certificate has expired\nStatus: Handshake failed';
+                updateStatus('Error: SSL handshake failed - expired certificate');
+            } else {
+                document.getElementById('security-response').textContent = 
+                    'SSL Handshake Test Successful:\nURL: https://expired.badssl.com/\nStatus: SSL verified\nCertificate: Valid\nProtocol: TLS 1.3\nHandshake Time: 150ms';
+                updateStatus('Successfully completed SSL handshake');
+            }
+        }
+
+        function testMixedContent() {
+            if (shouldSimulateFailures) {
+                // Simulate mixed content error
+                document.getElementById('security-response').textContent = 
+                    'Mixed Content Test Failed:\nHTTP Resource: http://httpbin.org/image/png\nError: Mixed Content Blocked\nMessage: HTTP resource blocked on HTTPS page\nStatus: Blocked by security policy';
+                updateStatus('Error: Mixed content blocked by security policy');
+            } else {
+                document.getElementById('security-response').textContent = 
+                    'Mixed Content Test Successful:\nHTTP Resource: http://httpbin.org/image/png\nStatus: Loaded\nSecurity: Allowed\nContent Type: image/png';
+                updateStatus('Successfully loaded mixed content');
+            }
+        }
+
+        function testHTTPRedirect() {
+            if (shouldSimulateFailures) {
+                // Simulate HTTP redirect error
+                document.getElementById('security-response').textContent = 
+                    'HTTP Redirect Test Failed:\nURL: https://httpbingo.org/redirect/10\nError: Too many redirects\nMessage: Redirect chain exceeded maximum limit\nRedirects: 10/5 max';
+                updateStatus('Error: HTTP redirect chain exceeded limit');
+            } else {
+                document.getElementById('security-response').textContent = 
+                    'HTTP Redirect Test Successful:\nURL: https://httpbingo.org/redirect/10\nStatus: 200 OK\nRedirects: 10\nFinal URL: https://httpbingo.org/get\nTotal Time: 500ms';
+                updateStatus('Successfully completed redirect chain');
+            }
+        }
+
+        // Network Performance Tests
+        function testSlowNetwork() {
+            if (shouldSimulateFailures) {
+                // Simulate slow network error
+                setTimeout(() => {
+                    document.getElementById('performance-response').textContent = 
+                        'Slow Network Test Failed:\nConnection: Regular2G\nURL: https://httpbingo.org/drip?duration=20&numbytes=1000\nError: Request timeout\nMessage: Content loading too slow\nTimeout: 15000ms';
+                    updateStatus('Error: Slow network simulation failed');
+                }, 5000);
+            } else {
+                document.getElementById('performance-response').textContent = 
+                    'Slow Network Test Successful:\nConnection: Regular2G\nURL: https://httpbingo.org/drip?duration=20&numbytes=1000\nStatus: 200 OK\nContent Size: 1000 bytes\nLoad Time: 12000ms';
+                updateStatus('Successfully completed slow network test');
+            }
+        }
+
+        function testBandwidthLimit() {
+            if (shouldSimulateFailures) {
+                // Simulate bandwidth limit error
+                setTimeout(() => {
+                    document.getElementById('performance-response').textContent = 
+                        'Bandwidth Limit Test Failed:\nRequests: 10 x 10KB\nError: Bandwidth exceeded\nMessage: Too many concurrent requests\nStatus: Rate limited';
+                    updateStatus('Error: Bandwidth limit exceeded');
+                }, 3000);
+            } else {
+                document.getElementById('performance-response').textContent = 
+                    'Bandwidth Limit Test Successful:\nRequests: 10 x 10KB\nStatus: All completed\nTotal Data: 100KB\nTotal Time: 8000ms\nAverage Speed: 12.5 KB/s';
+                updateStatus('Successfully completed bandwidth test');
+            }
+        }
+
+        // Network status management
+        function updateNetworkStatus() {
+            const statusElement = document.getElementById('network-status');
+            if (networkOnline) {
+                statusElement.textContent = 'Network Status: Online';
+                statusElement.className = 'network-status status-success';
+            } else {
+                statusElement.textContent = 'Network Status: Offline';
+                statusElement.className = 'network-status status-error';
+            }
+        }
+
+        function refreshNetworkStatus() {
+            updateNetworkStatus();
+            updateStatus(`Network status refreshed: ${networkOnline ? 'Online' : 'Offline'}`);
+        }
+
+        function simulateNetworkOffline() {
+            networkOnline = false;
+            updateNetworkStatus();
+            updateStatus('Network simulated as offline');
+        }
+
+        function simulateNetworkOnline() {
+            networkOnline = true;
+            updateNetworkStatus();
+            updateStatus('Network simulated as online');
+        }
+
+        // Utility functions
+        function simulateNetworkRequest(method, url, success = true) {
+            return new Promise((resolve, reject) => {
+                const startTime = Date.now();
+                
+                setTimeout(() => {
+                    const responseTime = Date.now() - startTime;
+                    
+                    if (success && networkOnline) {
+                        resolve({
+                            status: 200,
+                            responseTime: responseTime,
+                            data: { message: 'Request successful', url: url, method: method }
+                        });
+                    } else {
+                        reject(new Error(networkOnline ? 'Request failed' : 'Network offline'));
+                    }
+                }, simulatedLatency);
+            });
+        }
+
+        function clearAllResponses() {
+            document.querySelectorAll('.response-display').forEach(el => {
+                el.textContent = '';
+            });
+            document.querySelectorAll('[id$="-display"]').forEach(el => {
+                el.innerHTML = '';
+            });
+            updateStatus('All responses cleared');
+        }
+
+        function updateStatus(message) {
+            const statusElement = document.getElementById('status');
+            if (statusElement) {
+                statusElement.textContent = 'Status: ' + message;
+            }
+        }
+
+        // Initialize page on load
+        document.addEventListener('DOMContentLoaded', function() {
+            initializePage();
+        });
+
+        // Expose functions globally for test automation
+        window.networkTestUtils = {
+            configureForSuccess,
+            configureForFailure,
+            // DNS Resolution Tests
+            testDNSResolution,
+            testDNSTimeout,
+            testSubdomainResolution,
+            // Connection Timeout Tests
+            testServerConnectionTimeout,
+            testPortTimeout,
+            testFirewallBlocking,
+            // Resource Loading Tests
+            testImageLoading,
+            testCSSLoading,
+            testJavaScriptLoading,
+            testFontLoading,
+            // API Endpoint Tests
+            testRESTAPIEndpoint,
+            testGraphQLEndpoint,
+            testWebSocketConnection,
+            // CDN and External Service Tests
+            testCDNLoading,
+            testThirdPartyService,
+            testAnalyticsLoading,
+            // Protocol and Security Tests
+            testSSLHandshake,
+            testMixedContent,
+            testHTTPRedirect,
+            // Network Performance Tests
+            testSlowNetwork,
+            testBandwidthLimit,
+            // Utility functions
+            simulateNetworkOffline,
+            simulateNetworkOnline,
+            clearAllResponses,
+            getCurrentMode: () => currentMode,
+            isNetworkOnline: () => networkOnline,
+            // Legacy compatibility
+            enableSuccessMode: configureForSuccess,
+            enableFailureMode: configureForFailure,
+            testConnection: testDNSResolution,
+            testEndpoint: testServerConnectionTimeout,
+            testResource: testSubdomainResolution,
+            loadNetworkResource: testImageLoading,
+            loadCDNResource: testCDNLoading,
+            loadLocalResource: testCSSLoading,
+            testResponseTime: testSlowNetwork,
+            testLatency: testBandwidthLimit,
+            testConnectionStability: testHTTPRedirect
+        };
+    </script>
+</body>
+</html>

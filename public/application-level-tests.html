@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application Level Tests Page</title>
+    <style>
+        .test-section {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+
+        .success-state {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+        }
+
+        .failure-state {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+        }
+
+        .response-display {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 3px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            margin: 5px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .error-button {
+            background-color: #dc3545;
+        }
+
+        .error-button:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Application Level Tests Page</h1>
+    <p>This page contains all scenarios for Application-level testing - both success and failure modes</p>
+
+    <div id="test-container">
+        <!-- HTTP Error Tests -->
+        <div id="http-error-section">
+            <h3>HTTP Tests</h3>
+            
+            <div class="test-section" id="http-error-test-section">
+                <h4>HTTP Tests</h4>
+                <button onclick="testPageNotFound()">Test Page Not Found (404)</button>
+                <button onclick="testDocumentDownload()">Test Document Download (404)</button>
+                <button onclick="testServerError()">Test Server Error (500)</button>
+                <button onclick="testServiceUnavailable()">Test Service Unavailable (503)</button>
+                <div id="http-error-response" class="response-display"></div>
+            </div>
+        </div>
+
+        <!-- API Tests -->
+        <div id="api-error-section">
+            <h3>API Tests</h3>
+            
+            <div class="test-section" id="api-error-test-section">
+                <h4>API Tests</h4>
+                <button onclick="testAPIEndpoint()">Test API Endpoint</button>
+                <button onclick="testServerAPIStress()">Test Server API Stress</button>
+                <button onclick="testMaintenanceMode()">Test Maintenance Mode</button>
+                <div id="api-error-response" class="response-display"></div>
+            </div>
+        </div>
+
+        <!-- Access Control Tests -->
+        <div id="access-control-section">
+            <h3>Access Control Tests</h3>
+            
+            <div class="test-section" id="access-control-test-section">
+                <h4>Access Control Tests</h4>
+                <button onclick="testAccessPermission()">Test Access Permission (403)</button>
+                <button onclick="testDirectoryAccess()">Test Directory Access (403)</button>
+                <button onclick="testAuthentication()">Test Authentication (401)</button>
+                <button onclick="testUserCredentials()">Test User Credentials</button>
+                <div id="access-control-response" class="response-display"></div>
+            </div>
+        </div>
+
+        <!-- Security Tests -->
+        <div id="security-section">
+            <h3>Security Tests</h3>
+            
+            <div class="test-section" id="security-test-section">
+                <h4>Security Tests</h4>
+                <button onclick="testSSLCertificate()">Test SSL Certificate</button>
+                <button onclick="testCORSRequest()">Test CORS Request</button>
+                <div id="security-response" class="response-display"></div>
+            </div>
+        </div>
+
+        <!-- JavaScript Execution Tests -->
+        <div id="javascript-section">
+            <h3>JavaScript Execution Tests</h3>
+            
+            <div class="test-section" id="javascript-test-section">
+                <h4>JavaScript Execution Tests</h4>
+                <button onclick="testJavaScriptExecution()">Test JavaScript Execution</button>
+                <button onclick="testPageLoadTimeout()">Test Page Load Timeout</button>
+                <div id="javascript-response" class="response-display"></div>
+            </div>
+        </div>
+
+        <!-- Test Elements (Hidden by default) -->
+        <div id="test-elements" style="display: none;">
+            <!-- Status indicators for tests -->
+            <div id="main-content">Main Content</div>
+            <div id="page-header">Page Header</div>
+            <div id="api-success-indicator">API Success Indicator</div>
+            <div id="main-navigation">Main Navigation</div>
+            <div id="server-success-indicator">Server Success Indicator</div>
+            <div id="content-wrapper">Content Wrapper</div>
+            <div id="maintenance-success-indicator">Maintenance Success Indicator</div>
+            <div id="user-dashboard">User Dashboard</div>
+            <div id="admin-panel">Admin Panel</div>
+            <div id="protected-content">Protected Content</div>
+            <div id="auth-success-indicator">Auth Success Indicator</div>
+            <div id="secure-badge">Secure Badge</div>
+            <div id="cors-result">CORS Result</div>
+            
+            <!-- Test buttons for API calls -->
+            <button onclick="callMissingAPI()">Call Missing API</button>
+            <button onclick="triggerServerError()">Trigger Server Error</button>
+            <button onclick="simulateMaintenanceMode()">Simulate Maintenance Mode</button>
+            <button onclick="testInvalidAuth()">Test Invalid Auth</button>
+        </div>
+
+        <!-- Control Panel -->
+        <div id="control-panel" style="margin-top: 30px; padding: 20px; border: 2px solid #007bff;">
+            <h3>Test Control Panel</h3>
+            <button onclick="configureForSuccess()">Configure for Success</button>
+            <button onclick="configureForFailure()">Configure for Failure</button>
+            <button onclick="clearAllResponses()">Clear All Responses</button>
+            <p id="status">Status: Ready</p>
+        </div>
+    </div>
+
+    <script>
+        // Global state management
+        let currentMode = 'neutral';
+        let shouldSimulateFailures = false;
+
+        // Initialize page
+        function initializePage() {
+            updateStatus('Page initialized - ready for test scenarios');
+        }
+
+        // Configure page for success scenarios
+        function configureForSuccess() {
+            currentMode = 'success';
+            shouldSimulateFailures = false;
+
+            // Update visual state
+            document.querySelectorAll('.test-section').forEach(el => {
+                el.classList.add('success-state');
+                el.classList.remove('failure-state');
+            });
+
+            updateStatus('Success mode configured - all operations will succeed');
+        }
+
+        // Configure page for failure scenarios
+        function configureForFailure() {
+            currentMode = 'failure';
+            shouldSimulateFailures = true;
+
+            // Update visual state
+            document.querySelectorAll('.test-section').forEach(el => {
+                el.classList.add('failure-state');
+                el.classList.remove('success-state');
+            });
+
+            updateStatus('Failure mode configured - operations will fail');
+        }
+
+        // HTTP Error Tests
+        function testPageNotFound() {
+            if (shouldSimulateFailures) {
+                // Simulate HTTP 404 error for missing page
+                document.getElementById('http-error-response').textContent = 
+                    'Page Not Found Test Failed:\nURL: https://test-data-rca.netlify.app/non-existent-page.html\nStatus: 404 Not Found\nError: Page does not exist\nMessage: The requested page could not be found';
+                updateStatus('Error: Page not found - 404 error');
+            } else {
+                document.getElementById('http-error-response').textContent = 
+                    'Page Not Found Test Successful:\nURL: https://test-data-rca.netlify.app/non-existent-page.html\nStatus: 200 OK\nContent: Page loaded successfully\nMain Content: Available';
+                updateStatus('Successfully loaded page content');
+            }
+        }
+
+        function testDocumentDownload() {
+            if (shouldSimulateFailures) {
+                // Simulate HTTP 404 error for missing document
+                document.getElementById('http-error-response').textContent = 
+                    'Document Download Test Failed:\nURL: https://test-data-rca.netlify.app/missing-document.pdf\nStatus: 404 Not Found\nError: Document not found\nMessage: The requested document could not be found';
+                updateStatus('Error: Document download failed - 404 error');
+            } else {
+                document.getElementById('http-error-response').textContent = 
+                    'Document Download Test Successful:\nURL: https://test-data-rca.netlify.app/missing-document.pdf\nStatus: 200 OK\nContent-Type: application/pdf\nSize: 1.2MB\nDownload: Completed';
+                updateStatus('Successfully downloaded document');
+            }
+        }
+
+        function testServerError() {
+            if (shouldSimulateFailures) {
+                // Simulate HTTP 500 error
+                document.getElementById('http-error-response').textContent = 
+                    'Server Error Test Failed:\nURL: https://httpbingo.org/status/500\nStatus: 500 Internal Server Error\nError: Server encountered an error\nMessage: Internal server error occurred';
+                updateStatus('Error: Server error - 500 error');
+            } else {
+                document.getElementById('http-error-response').textContent = 
+                    'Server Error Test Successful:\nURL: https://httpbingo.org/status/500\nStatus: 200 OK\nServer: Operational\nResponse Time: 150ms';
+                updateStatus('Successfully accessed server');
+            }
+        }
+
+        function testServiceUnavailable() {
+            if (shouldSimulateFailures) {
+                // Simulate HTTP 503 error
+                document.getElementById('http-error-response').textContent = 
+                    'Service Unavailable Test Failed:\nURL: https://httpbingo.org/status/503\nStatus: 503 Service Unavailable\nError: Service temporarily unavailable\nMessage: Service is currently unavailable';
+                updateStatus('Error: Service unavailable - 503 error');
+            } else {
+                document.getElementById('http-error-response').textContent = 
+                    'Service Unavailable Test Successful:\nURL: https://httpbingo.org/status/503\nStatus: 200 OK\nService: Available\nUptime: 99.9%';
+                updateStatus('Successfully accessed service');
+            }
+        }
+
+        // API Error Tests
+        function testAPIEndpoint() {
+            if (shouldSimulateFailures) {
+                // Simulate API endpoint error
+                document.getElementById('api-error-response').textContent = 
+                    'API Endpoint Test Failed:\nEndpoint: /api/missing-endpoint\nStatus: 404 Not Found\nError: API endpoint does not exist\nMessage: The requested API endpoint was not found';
+                updateStatus('Error: API endpoint not found');
+            } else {
+                document.getElementById('api-error-response').textContent = 
+                    'API Endpoint Test Successful:\nEndpoint: /api/missing-endpoint\nStatus: 200 OK\nResponse: {"data": "success"}\nAPI: Operational';
+                updateStatus('Successfully accessed API endpoint');
+            }
+        }
+
+        function testServerAPIStress() {
+            if (shouldSimulateFailures) {
+                // Simulate server API stress error
+                document.getElementById('api-error-response').textContent = 
+                    'Server API Stress Test Failed:\nEndpoint: /api/stress-test\nStatus: 500 Internal Server Error\nError: Server overloaded\nMessage: Server cannot handle the current load';
+                updateStatus('Error: Server API stress test failed');
+            } else {
+                document.getElementById('api-error-response').textContent = 
+                    'Server API Stress Test Successful:\nEndpoint: /api/stress-test\nStatus: 200 OK\nLoad: Handled successfully\nResponse Time: 250ms';
+                updateStatus('Successfully completed server API stress test');
+            }
+        }
+
+        function testMaintenanceMode() {
+            if (shouldSimulateFailures) {
+                // Simulate maintenance mode error
+                document.getElementById('api-error-response').textContent = 
+                    'Maintenance Mode Test Failed:\nStatus: 503 Service Unavailable\nError: Service in maintenance mode\nMessage: The service is currently under maintenance\nRetry-After: 3600 seconds';
+                updateStatus('Error: Service in maintenance mode');
+            } else {
+                document.getElementById('api-error-response').textContent = 
+                    'Maintenance Mode Test Successful:\nStatus: 200 OK\nService: Operational\nMaintenance: Completed\nUptime: 100%';
+                updateStatus('Successfully accessed service after maintenance');
+            }
+        }
+
+        // Access Control Tests
+        function testAccessPermission() {
+            if (shouldSimulateFailures) {
+                // Simulate HTTP 403 error for access permission
+                document.getElementById('access-control-response').textContent = 
+                    'Access Permission Test Failed:\nURL: https://httpbingo.org/status/403\nStatus: 403 Forbidden\nError: Access denied\nMessage: You do not have permission to access this resource';
+                updateStatus('Error: Access permission denied - 403 error');
+            } else {
+                document.getElementById('access-control-response').textContent = 
+                    'Access Permission Test Successful:\nURL: https://httpbingo.org/status/403\nStatus: 200 OK\nAccess: Granted\nUser Dashboard: Available';
+                updateStatus('Successfully accessed protected resource');
+            }
+        }
+
+        function testDirectoryAccess() {
+            if (shouldSimulateFailures) {
+                // Simulate HTTP 403 error for directory access
+                document.getElementById('access-control-response').textContent = 
+                    'Directory Access Test Failed:\nURL: https://test-data-rca.netlify.app/admin/\nStatus: 403 Forbidden\nError: Directory access denied\nMessage: Access to admin directory is forbidden';
+                updateStatus('Error: Directory access denied - 403 error');
+            } else {
+                document.getElementById('access-control-response').textContent = 
+                    'Directory Access Test Successful:\nURL: https://test-data-rca.netlify.app/admin/\nStatus: 200 OK\nAccess: Granted\nAdmin Panel: Available';
+                updateStatus('Successfully accessed admin directory');
+            }
+        }
+
+        function testAuthentication() {
+            if (shouldSimulateFailures) {
+                // Simulate HTTP 401 error for authentication
+                document.getElementById('access-control-response').textContent = 
+                    'Authentication Test Failed:\nURL: https://httpbingo.org/status/401\nStatus: 401 Unauthorized\nError: Authentication required\nMessage: Valid credentials are required to access this resource';
+                updateStatus('Error: Authentication required - 401 error');
+            } else {
+                document.getElementById('access-control-response').textContent = 
+                    'Authentication Test Successful:\nURL: https://httpbingo.org/status/401\nStatus: 200 OK\nAuthentication: Successful\nProtected Content: Available';
+                updateStatus('Successfully authenticated user');
+            }
+        }
+
+        function testUserCredentials() {
+            if (shouldSimulateFailures) {
+                // Simulate authentication error for invalid credentials
+                document.getElementById('access-control-response').textContent = 
+                    'User Credentials Test Failed:\nCredentials: Invalid\nStatus: 401 Unauthorized\nError: Invalid username or password\nMessage: The provided credentials are incorrect';
+                updateStatus('Error: Invalid user credentials');
+            } else {
+                document.getElementById('access-control-response').textContent = 
+                    'User Credentials Test Successful:\nCredentials: Valid\nStatus: 200 OK\nAuthentication: Successful\nUser Session: Created';
+                updateStatus('Successfully validated user credentials');
+            }
+        }
+
+        // Security Tests
+        function testSSLCertificate() {
+            if (shouldSimulateFailures) {
+                // Simulate SSL certificate error
+                document.getElementById('security-response').textContent = 
+                    'SSL Certificate Test Failed:\nURL: https://self-signed.badssl.com/\nError: SSL_ERROR_SELF_SIGNED_CERT\nMessage: SSL certificate is self-signed\nSecurity: Certificate not trusted';
+                updateStatus('Error: SSL certificate validation failed');
+            } else {
+                document.getElementById('security-response').textContent = 
+                    'SSL Certificate Test Successful:\nURL: https://self-signed.badssl.com/\nStatus: SSL verified\nCertificate: Valid and trusted\nSecurity Badge: Available';
+                updateStatus('Successfully validated SSL certificate');
+            }
+        }
+
+        function testCORSRequest() {
+            if (shouldSimulateFailures) {
+                // Simulate CORS error
+                document.getElementById('security-response').textContent = 
+                    'CORS Request Test Failed:\nURL: https://api.github.com/users/octocat\nError: CORS policy violation\nMessage: Cross-origin request blocked by CORS policy\nMethod: POST not allowed';
+                updateStatus('Error: CORS request blocked');
+            } else {
+                document.getElementById('security-response').textContent = 
+                    'CORS Request Test Successful:\nURL: https://api.github.com/users/octocat\nStatus: 200 OK\nCORS: Allowed\nResponse: Data received successfully';
+                updateStatus('Successfully completed CORS request');
+            }
+        }
+
+        // JavaScript Execution Tests
+        function testJavaScriptExecution() {
+            if (shouldSimulateFailures) {
+                // Simulate JavaScript execution error
+                document.getElementById('javascript-response').textContent = 
+                    'JavaScript Execution Test Failed:\nError: ReferenceError\nMessage: nonExistentObject is not defined\nLine: window.nonExistentObject.someProperty\nExecution: Failed';
+                updateStatus('Error: JavaScript execution failed');
+            } else {
+                document.getElementById('javascript-response').textContent = 
+                    'JavaScript Execution Test Successful:\nScript: Executed without errors\nObjects: All defined\nExecution: Completed successfully';
+                updateStatus('Successfully executed JavaScript');
+            }
+        }
+
+        function testPageLoadTimeout() {
+            if (shouldSimulateFailures) {
+                // Simulate page load timeout error
+                document.getElementById('javascript-response').textContent = 
+                    'Page Load Timeout Test Failed:\nURL: https://httpbingo.org/delay/10\nError: Page load timeout\nTimeout: 3000ms\nMessage: Page failed to load within timeout period';
+                updateStatus('Error: Page load timeout');
+            } else {
+                document.getElementById('javascript-response').textContent = 
+                    'Page Load Timeout Test Successful:\nURL: https://httpbingo.org/delay/10\nStatus: 200 OK\nLoad Time: 2500ms\nContent: Loaded successfully';
+                updateStatus('Successfully loaded page within timeout');
+            }
+        }
+
+        // API call functions for buttons
+        function callMissingAPI() {
+            if (shouldSimulateFailures) {
+                document.getElementById('api-success-indicator').style.display = 'none';
+                updateStatus('API call failed - endpoint not found');
+            } else {
+                document.getElementById('api-success-indicator').style.display = 'block';
+                updateStatus('API call successful');
+            }
+        }
+
+        function triggerServerError() {
+            if (shouldSimulateFailures) {
+                document.getElementById('server-success-indicator').style.display = 'none';
+                updateStatus('Server error triggered');
+            } else {
+                document.getElementById('server-success-indicator').style.display = 'block';
+                updateStatus('Server operating normally');
+            }
+        }
+
+        function simulateMaintenanceMode() {
+            if (shouldSimulateFailures) {
+                document.getElementById('maintenance-success-indicator').style.display = 'none';
+                updateStatus('Service in maintenance mode');
+            } else {
+                document.getElementById('maintenance-success-indicator').style.display = 'block';
+                updateStatus('Service operational');
+            }
+        }
+
+        function testInvalidAuth() {
+            if (shouldSimulateFailures) {
+                document.getElementById('auth-success-indicator').style.display = 'none';
+                updateStatus('Authentication failed');
+            } else {
+                document.getElementById('auth-success-indicator').style.display = 'block';
+                updateStatus('Authentication successful');
+            }
+        }
+
+        // Utility functions
+        function clearAllResponses() {
+            document.querySelectorAll('.response-display').forEach(el => {
+                el.textContent = '';
+            });
+            document.querySelectorAll('[id$="-display"]').forEach(el => {
+                el.innerHTML = '';
+            });
+            updateStatus('All responses cleared');
+        }
+
+        function updateStatus(message) {
+            const statusElement = document.getElementById('status');
+            if (statusElement) {
+                statusElement.textContent = 'Status: ' + message;
+            }
+        }
+
+        // Initialize page on load
+        document.addEventListener('DOMContentLoaded', function () {
+            initializePage();
+        });
+
+        // Expose functions globally for test automation
+        window.applicationTestUtils = {
+            configureForSuccess,
+            configureForFailure,
+            // HTTP Error Tests
+            testPageNotFound,
+            testDocumentDownload,
+            testServerError,
+            testServiceUnavailable,
+            // API Error Tests
+            testAPIEndpoint,
+            testServerAPIStress,
+            testMaintenanceMode,
+            // Access Control Tests
+            testAccessPermission,
+            testDirectoryAccess,
+            testAuthentication,
+            testUserCredentials,
+            // Security Tests
+            testSSLCertificate,
+            testCORSRequest,
+            // JavaScript Execution Tests
+            testJavaScriptExecution,
+            testPageLoadTimeout,
+            // API call functions
+            callMissingAPI,
+            triggerServerError,
+            simulateMaintenanceMode,
+            testInvalidAuth,
+            // Utility functions
+            clearAllResponses,
+            getCurrentMode: () => currentMode,
+            // Legacy compatibility
+            enableSuccessMode: configureForSuccess,
+            enableFailureMode: configureForFailure
+        };
+    </script>
+</body>
+
+</html>
