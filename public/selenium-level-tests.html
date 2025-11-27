@@ -153,10 +153,6 @@
             <button id="enabled-button">Enabled Button</button>
             <div id="visible-element" style="display: block;">Visible Element</div>
             
-            <!-- Elements for failure scenarios -->
-            <button id="removable-element">Removable Element</button>
-            <button onclick="removeElement()" id="remove-button">Remove Above Element</button>
-            
             <!-- Dynamic content -->
             <div id="dynamic-content">Dynamic Content</div>
             
@@ -380,14 +376,6 @@
                 document.getElementById('performance-response').textContent = 
                     'Disabled Element Interaction Test Successful:\nButton: disabled-button (enabled)\nInput: disabled-input (enabled)\nResult: Successfully interacted with enabled elements';
                 updateStatus('Successfully interacted with enabled elements');
-            }
-        }
-
-        // Utility function to remove element (for dynamic tests)
-        function removeElement() {
-            const element = document.getElementById('removable-element');
-            if (element && element.parentNode) {
-                element.parentNode.removeChild(element);
             }
         }
 
