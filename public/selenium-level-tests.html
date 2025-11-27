@@ -175,7 +175,6 @@
             <input id="disabled-input" disabled placeholder="Disabled Input">
             
             <!-- Iframe content -->
-            <iframe id="test-iframe" src="data:text/html,<button id='iframe-button'>Iframe Button</button>"></iframe>
             
             <!-- Content element for page load tests -->
             <div id="content">Page Content</div>
@@ -432,8 +431,6 @@
                     return document.getElementById('disabled-button');
                 case 'disabled-input':
                     return document.getElementById('disabled-input');
-                case 'iframe-button':
-                    return document.getElementById('iframe-button');
                 case 'content':
                     return document.getElementById('content');
                 default:
