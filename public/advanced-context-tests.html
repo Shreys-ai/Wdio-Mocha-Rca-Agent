@@ -646,14 +646,6 @@
     </div>
 
     <!-- Animation Test Section -->
-    <div class="section">
-        <h2>5. Dynamic Animations</h2>
-        <div class="animation-container">
-            <button id="animated-button" class="animated-button">Click Me During Animation</button>
-            <button id="trigger-animation" class="btn btn-primary">Start Animation</button>
-        </div>
-        <p>Click "Start Animation" then quickly try to click the animated button while it's moving.</p>
-    </div>
 
     <!-- Dropdown Section -->
     <div class="section">
@@ -1143,8 +1135,7 @@
 
         // Animation Implementation
         function initializeAnimations() {
-            document.getElementById('trigger-animation').addEventListener('click', triggerAnimation);
-            document.getElementById('animated-button').addEventListener('click', handleAnimatedButtonClick);
+            document.getElementById('trigger-animations').addEventListener('click', triggerAnimation);
         }
 
         function triggerAnimation() {
